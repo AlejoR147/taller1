@@ -1,4 +1,4 @@
-# 🎮 [Seller Game]
+# 🎮 Seller Game
 
 ![Godot Engine](https://img.shields.io/badge/GODOT_4-%23478CBF.svg?style=for-the-badge&logo=godot-engine&logoColor=white)
 ![C#](https://img.shields.io/badge/C%23-%23239120.svg?style=for-the-badge&logo=c-sharp&logoColor=white)
