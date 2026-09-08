@@ -30,3 +30,7 @@ Para clonar y ejecutar este proyecto en tu máquina local, necesitas tener insta
 1. **Clonar el repositorio:**
    ```bash
    git clone [https://github.com/tu-usuario/nombre-del-repo.git](https://github.com/tu-usuario/nombre-del-repo.git)
+
+
+<img width="983" height="554" alt="image" src="https://github.com/user-attachments/assets/2989226d-c92d-46d1-9bd8-5c04b5197ff9" />
+
