@@ -1,8 +1,13 @@
 using Godot;
+using SellerGame.Characters;
 using System;
 
 public partial class Goblin : NPC, IThief
 {
-    public int Thief { get; set; } = 1;
-    public new string NameNpc { get; set; } = "Goblin";
+    public int StealAmount { get; set; } = 1;
+    public override void _Ready()
+    {
+        base._Ready(); 
+        NameNpc = "Goblin";
+    }
 }

@@ -5,9 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SellerGame.Characters
-{
-}
+namespace SellerGame.Characters;
 public partial class NPC : StaticBody2D
 {
     private AnimatedSprite2D _animator;

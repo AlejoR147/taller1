@@ -1,26 +1,26 @@
 using Godot;
+using SellerGame.Characters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
 using System.Runtime.InteropServices.Marshalling;
-using static Godot.BaseMaterial3D;
-
 public partial class Seller : CharacterBody2D
 {
+	[Export] public int Speed = 200;
+    private AnimatedSprite2D _animator;
     private string _idle = "defaultWood";
     private string _run = "runWood";
-    private AnimatedSprite2D _animator;
-	private TextureRect _xIndicator;
+
+    private TextureRect _xIndicator;
 	private Label _woodIndicator;
-	public int WoodCounts { get; private set; } = 20;
+    [Export] public int WoodCounts { get; private set; } = 20;
+
     private Label _coinIndicator;
     private int _coinCounts = 0;
+
 	private Node2D _npc;
 	public List<Transaction> Transactions  = new List<Transaction>();
-	private int _coinsEarned;
-	private int _coinsBefore; 
-	public string totalTransactions { get; set;}
 
     public override void _Ready()
 	{
@@ -42,7 +42,7 @@ public partial class Seller : CharacterBody2D
 	{
 		var move = Input.GetVector("move_left", "move_right", "move_up", "move_down");
 
-		Velocity = move * 200;
+		Velocity = move * Speed;
 
 		if (Velocity.X != 0 || Velocity.Y != 0)
 		{
@@ -68,25 +68,30 @@ public partial class Seller : CharacterBody2D
 
 			if (_npc is IBuyer buyer)
 			{
-                _coinsBefore = _coinCounts;
+                int _coinsBefore = _coinCounts;
                 buyer.Buy(this);
-				_coinsEarned = _coinCounts - _coinsBefore;
+				int _coinsEarned = _coinCounts - _coinsBefore;
 
-                RegisterSale(((NPC)_npc), _coinsEarned);
+                RegisterSale(((NPC)_npc).NameNpc, _coinsEarned);
             }
 
 			if (_npc is IThief thief)
 			{
-				thief.Steal(this);
+                int woodBefore = WoodCounts;
+                thief.Steal(this);
+                int woodStolen = woodBefore - WoodCounts;
+
+                if (woodStolen > 0)
+                {
+                    RegisterThief(((NPC)_npc).NameNpc, woodStolen);
+                }
             }
 
         }
 
 		if (Input.IsActionJustPressed("show_resume"))
 		{
-			totalTransactions = ShowTransactions();
-            GD.Print($"{totalTransactions}");
-
+            GD.Print($"{ShowTransactions()}");
         }
 	}
     private void ActualizarAnimaciones()
@@ -117,11 +122,11 @@ public partial class Seller : CharacterBody2D
 		_npc = null;
 	}
 
-    public void DiscountWood(int Thief = 1)
+    public void DiscountWood(int amount = 1)
     {
         if (WoodCounts <= 0) return;
 
-        WoodCounts -= Thief;
+        WoodCounts -= amount;
         _woodIndicator.Text = WoodCounts.ToString();
         ActualizarAnimaciones();
     }
@@ -132,13 +137,13 @@ public partial class Seller : CharacterBody2D
 		_coinIndicator.Text = _coinCounts.ToString();
     }
 
-	public void RegisterSale(NPC npc, int coinsEarned) 
+	public void RegisterSale(string npcName, int coinsEarned) 
 	{
 		bool salefound = false;
 
 		foreach (Transaction t in Transactions)
 		{
-			if (t.NameNpc == npc.NameNpc)
+			if (t.NameNpc == npcName)
 			{ t.TotalCounts += coinsEarned;
 				salefound = true;
 				break;
@@ -147,37 +152,35 @@ public partial class Seller : CharacterBody2D
 
 		if (!salefound)
 		{
-			var newSale = new Sale(npc.NameNpc, coinsEarned);
+			var newSale = new Sale(npcName, coinsEarned);
 			Transactions.Add(newSale);
 		}
 
     }
     public void RegisterThief(string npcName, int amount)
     {
-        var existingSale = Transactions.Find(t => t is Theft && t.NameNpc == npcName) as Theft;
+        var existingTheft = Transactions.Find(t => t is Theft && t.NameNpc == npcName) as Theft;
 
-        if (existingSale != null)
+        if (existingTheft != null)
         {
-            existingSale.TotalCounts += amount;
+            existingTheft.TotalCounts += amount;
         }
         else
         {
             Transactions.Add(new Theft(npcName, amount));
         }
-
     }
-
     public string ShowTransactions()
 	{
+		if (Transactions.Count == 0) return "No hay transaciones";
 		string resultado = "";
 		foreach (Transaction t in Transactions)
 		{
-			resultado += $"Name Npc: {t.NameNpc} -> ";
+			resultado += $"Npc: {t.NameNpc} -> ";
 
 			if (t is Sale) { resultado += $"Dinero obtenido: {t.TotalCounts}\n"; }
 			if (t is Theft) { resultado += $"Maderas robadas: {t.TotalCounts}\n"; }
 		}
         return resultado;
-
     }
 }

@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SellerGame.Characters
-{
-}
+namespace SellerGame.Characters;
 public class Transaction //historial
 {
     public string NameNpc { get; set; }
